@@ -46,6 +46,10 @@ const lineShortStartNEndPoint = (longLine, shortLine) => {
   }
 }
 
+module.exports.mergeOneFeatureCollection = geojsonArray => {
+  return turf.featureCollection([...geojsonArray]);
+}
+
 module.exports.maskLineByLine = (fromLine, maskLine) => {
   const [startPointShort, endPointShort] = lineShortStartNEndPoint(fromLine, maskLine);
   const [startPointLong, endPointLong] = lineToStartNEndPoint(fromLine);
