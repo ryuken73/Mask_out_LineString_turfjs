@@ -7,7 +7,7 @@ const intersectEnd = require('./intersectEnd.json');
 const { featureCollection } = require('@turf/turf');
 
 
-const parseFeatureCollection = featureCollection => {
+const geojsonToTurfObj = featureCollection => {
   const features = [];
   turf.featureEach(featureCollection, (currentFeature) => {
     features.push(currentFeature)
@@ -29,7 +29,7 @@ const lineBearing = (lineString) => {
   return turf.bearing(startCoord, endCoord)
 }
 
-const lineLength = (lineString) => {
+const lineLengthMeter = (lineString) => {
   return turf.length(lineString, {units: 'meters'});
 }
 
@@ -63,13 +63,13 @@ const maskLineByLine = (fromLine, maskLine) => {
 }
 
 const main = () => {
-  const features = parseFeatureCollection(parallel);
+  const features = geojsonToTurfObj(parallel);
   // const features = parseFeatureCollection(intersects);
   // const features = parseFeatureCollection(intersectEnd);
   const [fromLine, maskLine] = features;
   features.forEach(lineString => {
     console.log(lineBearing(lineString));
-    console.log(lineLength(lineString));
+    console.log(lineLengthMeter(lineString));
   })
   console.log(isLinesParallel(fromLine, maskLine))
   console.log(isFeatureIntersects(fromLine, maskLine))
