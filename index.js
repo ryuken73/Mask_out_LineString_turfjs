@@ -63,9 +63,9 @@ const maskLineByLine = (fromLine, maskLine) => {
 }
 
 const main = () => {
-  // const features = parseFeatureCollection(parallel);
+  const features = parseFeatureCollection(parallel);
   // const features = parseFeatureCollection(intersects);
-  const features = parseFeatureCollection(intersectEnd);
+  // const features = parseFeatureCollection(intersectEnd);
   const [fromLine, maskLine] = features;
   features.forEach(lineString => {
     console.log(lineBearing(lineString));
