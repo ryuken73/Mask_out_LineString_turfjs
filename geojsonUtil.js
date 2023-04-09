@@ -8,7 +8,7 @@ const parseFeatureCollection = featureCollection => {
   return features;
 }
 
-const uniqLines = (features) => {
+module.exports.uniqLines = (features) => {
   let cloned = [...features];
   let uniq = [];
   while(cloned.length > 0){
@@ -47,8 +47,8 @@ module.exports.splitRedYellowFeatures = featureCollectionArray => {
   const yellowFeatures = featureArray.filter(feature => {
       return feature.properties.color === 'yellow'
   })
-  const uniqRedFeatures = uniqLines(redFeatures)
-  const uniqYellowFeatures = uniqLines(yellowFeatures)
+  const uniqRedFeatures = this.uniqLines(redFeatures)
+  const uniqYellowFeatures = this.uniqLines(yellowFeatures)
 
   return [uniqRedFeatures, uniqYellowFeatures]
 }

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const turf = require('@turf/turf')
 const featureCollectionArray = require('./samples/realData.json');
 const splitRed = require('./splitRed');
 const geojsonUtil = require('./geojsonUtil');
@@ -20,6 +21,12 @@ const splitedFile = fs.createWriteStream('./splited.json');
 const main = () => {
 
   const [redFeatures, yellowFeatures] = splitRedYellowFeatures(featureCollectionArray);
+  // const totalFeatures = [
+  //   ...redFeatures,
+  //   ...yellowFeatures
+  // ]
+  // const uniqF = uniqLines(totalFeatures);
+  // console.log(JSON.stringify(turf.featureCollection(uniqF)));
   const fromRedFeatures = redFeatures[4];
 
   redFeatures.forEach(redFeature => {
