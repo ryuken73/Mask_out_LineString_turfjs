@@ -29,7 +29,7 @@ const main = () => {
     console.log(`number of intersect yellow: ${redFeature.id}:`, intersects.length);
   })
 
-  const fromLine = redFeatures[4];
+  const fromLine = redFeatures[1];
   const maskLines = yellowFeatures.filter(yellowFeature => {
     return isFeatureIntersects(fromLine, yellowFeature)
   })

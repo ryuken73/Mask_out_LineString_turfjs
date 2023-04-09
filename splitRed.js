@@ -101,11 +101,11 @@ module.exports = (fromLine ,maskLines, debug=false) => {
     if(startPTonMask.properties.location !== endPTonMask.properties.location){
       // need to split yellowFeature (split to three part)
       const [startPtOfMask, endPtOfMask] = getStartEndPT(maskLine);
-      const firstPTonMask = startPTonMask.properties.location > endPTonMask.properties.location ? startPTonMask : endPTonMask;
-      const secondPTonMask = startPTonMask.properties.location > endPTonMask.properties.location ? endPTonMask : startPTonMask;
+      const firstPTonMask = startPTonMask.properties.location > endPTonMask.properties.location ? endPTonMask :startPTonMask;
+      const secondPTonMask = startPTonMask.properties.location > endPTonMask.properties.location ? startPTonMask : endPTonMask;
       const splitted = [
         turf.lineString([turf.getCoord(startPtOfMask), turf.getCoord(firstPTonMask)]),
-        turf.lineString([turf.getCoord(firstPTonMask), turf.getCoord(secondPTonMask)]),
+        // turf.lineString([turf.getCoord(firstPTonMask), turf.getCoord(secondPTonMask)]),
         turf.lineString([turf.getCoord(secondPTonMask), turf.getCoord(endPtOfMask)])
       ]
       const filterd = splitted.filter(part => isFeatureIntersects(fromLine, part))
