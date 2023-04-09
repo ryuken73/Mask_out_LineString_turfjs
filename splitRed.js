@@ -1,4 +1,5 @@
 const turf = require('@turf/turf');
+const { isFeatureIntersects } = require('./geojsonUtil');
 
 const fromLine = turf.lineString([
           [0,0],[0,5],
@@ -80,12 +81,51 @@ const splitLineToPoint = (fromLine, startPoint, toPoint) => {
 
 const print = obj => console.log(JSON.stringify(obj));
 
-const main = () => {
-  const debug = true
+module.exports = (fromLine ,maskLines, debug=false) => {
   //1. remove duplicate maskLines
   const uniqMaskLines = uniqFeatures(maskLines);
+  if(debug === true){
+    uniqMaskLines.forEach(maskLine => {
+      console.log('1. maskLine')
+      print(maskLine)
+    })
+  }
+  // check nearest point of fromLine's start/end point
+  const [startPTfromLine, endPTfromLine] = getStartEndPT(fromLine)
+  const middleIntersetHandled = uniqMaskLines.reduce((acct, maskLine) => {
+    const startPTonMask = turf.nearestPointOnLine(maskLine, startPTfromLine, {units: 'meters'})
+    const endPTonMask = turf.nearestPointOnLine(maskLine, endPTfromLine, {units: 'meters'})
+    console.log(`maskLine[${maskLine.id}'s nearest point on yellow`)
+    print(startPTonMask)
+    print(endPTonMask)
+    if(startPTonMask.properties.location !== endPTonMask.properties.location){
+      // need to split yellowFeature (split to three part)
+      const [startPtOfMask, endPtOfMask] = getStartEndPT(maskLine);
+      const firstPTonMask = startPTonMask.properties.location > endPTonMask.properties.location ? startPTonMask : endPTonMask;
+      const secondPTonMask = startPTonMask.properties.location > endPTonMask.properties.location ? endPTonMask : startPTonMask;
+      const splitted = [
+        turf.lineString([turf.getCoord(startPtOfMask), turf.getCoord(firstPTonMask)]),
+        turf.lineString([turf.getCoord(firstPTonMask), turf.getCoord(secondPTonMask)]),
+        turf.lineString([turf.getCoord(secondPTonMask), turf.getCoord(endPtOfMask)])
+      ]
+      const filterd = splitted.filter(part => isFeatureIntersects(fromLine, part))
+      print(turf.featureCollection(splitted));
+      return [
+        ...acct,
+        ...filterd
+      ]
+    }
+    return [
+      ...acct,
+      maskLine
+    ]
+  }, [])
+  console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+  print(uniqMaskLines)
+  print(middleIntersetHandled)
+
   //2. get overlapping points along with main line
-  const overlapPTs = uniqMaskLines.map(maskLine => {
+  const overlapPTs = middleIntersetHandled.map(maskLine => {
     return getOverlapStartEndPT(fromLine, maskLine)
   })
   //3. adjust start point of overlapping points to have same direction.
@@ -95,7 +135,7 @@ const main = () => {
 
   if(debug === true){
     alignedPTs.forEach(([startPT, endPT]) => {
-      console.log('##########################')
+      console.log('2 alignedPTs ##########################')
       print(startPT.geometry);
       print(endPT.geometry);
     })
@@ -108,7 +148,7 @@ const main = () => {
   })
   if(debug === true){
     sortedPTs.forEach(([startPT, endPT]) => {
-      console.log('##########################')
+      console.log('sorted PTs ##########################')
       console.log(startPT, endPT)
       print(startPT.properties.location);
       print(startPT.geometry)
@@ -132,9 +172,8 @@ const main = () => {
       const lastResult = splitLineToPoint(fromLine, endMaskPT, getStartEndPT(fromLine)[1]);
       results.push(lastResult)}
   }
-  console.log(results)
-  print(turf.featureCollection(results));
+  return turf.featureCollection(results);
 }
 
-main()
+// main()
 
