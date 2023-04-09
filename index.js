@@ -1,9 +1,9 @@
 const turf = require('@turf/turf');
-const parallel = require('./parallel.json');
-const intersects = require('./intersects.json');
-const opposites = require('./intersectOpposite.json');
-const intersectStart = require('./intersectStart.json');
-const intersectEnd = require('./intersectEnd.json');
+const parallel = require('./samples/parallel.json');
+const intersects = require('./samples/intersects.json');
+const opposites = require('./samples/intersectOpposite.json');
+const intersectStart = require('./samples/intersectStart.json');
+const intersectEnd = require('./samples/intersectEnd.json');
 const { featureCollection } = require('@turf/turf');
 
 
@@ -55,17 +55,21 @@ const lineShortStartNEndPoint = (longLine, shortLine) => {
 
 
 const maskLineByLine = (fromLine, maskLine) => {
+  if(!isFeatureIntersects(fromLine, maskLine)){
+    return [featureCollection([fromLine]), fromLine];
+  }
   const [startPointShort, endPointShort] = lineShortStartNEndPoint(fromLine, maskLine);
   const [startPointLong, endPointLong] = lineToStartNEndPoint(fromLine);
   const firstSlice = turf.lineSlice(startPointLong, startPointShort, fromLine);
   const secondSlice = turf.lineSlice(endPointShort, endPointLong, fromLine);
-  return featureCollection([firstSlice, secondSlice])
+  return [featureCollection([firstSlice, secondSlice]), firstSlice, secondSlice]
 }
 
 const main = () => {
-  const features = geojsonToTurfObj(parallel);
-  // const features = parseFeatureCollection(intersects);
-  // const features = parseFeatureCollection(intersectEnd);
+  // const features = geojsonToTurfObj(parallel);
+  // const features = geojsonToTurfObj(intersects);
+  // const features = geojsonToTurfObj(intersectEnd);
+  const features = geojsonToTurfObj(intersectStart);
   const [fromLine, maskLine] = features;
   features.forEach(lineString => {
     console.log(lineBearing(lineString));
@@ -73,8 +77,10 @@ const main = () => {
   })
   console.log(isLinesParallel(fromLine, maskLine))
   console.log(isFeatureIntersects(fromLine, maskLine))
-  const masked = maskLineByLine(fromLine, maskLine)
+  const [masked, first, second] = maskLineByLine(fromLine, maskLine)
   console.log(JSON.stringify(masked));
+  console.log(JSON.stringify(first));
+  console.log(JSON.stringify(second));
 
 }
 main();
