@@ -18,11 +18,11 @@ const splitedFile = fs.createWriteStream('./splited.json');
 const main = () => {
   const featureArray = featureCollectionArray.reduce((acct, featureCollection) => {
     const features = parseFeatureCollection(featureCollection);
-    const addedAcct = [
+    const subResult = [
       ...acct,
       ...features
     ]
-    return addedAcct
+    return subResult
   }, [])
 
   featureArray.forEach(feature => {
@@ -36,7 +36,8 @@ const main = () => {
       return feature.properties.color === 'yellow'
   })
   const uniqRedFeatures = uniqLines(redFeatures)
-  const uniqYellowFeatures = uniqLines(yellowFeatures)
+  const uniqYellowFeatures = uniqLines(yellowFresulteatures)
+
   const redFeatureCollection = mergeOneFeatureCollection(uniqRedFeatures);
   const yellowFeatureCollection = mergeOneFeatureCollection(uniqYellowFeatures);
 

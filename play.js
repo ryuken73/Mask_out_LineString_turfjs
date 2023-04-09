@@ -4,7 +4,7 @@ const fromLine = turf.lineString([
           [0,0],[0,5],
           [0,5],[5,5],
           [5,5],[5,0],
-          [5,0],[1,0]]);
+          [5,0],[1,0]], {color: 'red'});
 // const lineStart = turf.lineString([[-1,0],[1,0]]);
 // const lineStartExact = turf.lineString([[-1,0],[0,0]]);
 // const lineMiddle = turf.lineString([[5,1],[5,2]]);
@@ -24,6 +24,10 @@ const maskLines = [
   lineEnd, 
   // lineEndExact
 ];
+
+const uniqId = () => {
+  return Date.now() + Math.ceil(Math.random() * 10000);
+}
 
 const reverseFeature = feature => {
   return turf.rewind(feature, {reverse: true})
@@ -48,9 +52,12 @@ const getStartEndPT = (feature) => {
   return [startPoint, endPoint];
 }
 const getOverlapStartEndPT = (fromLine, maskLine) => {
+  const {id=uniqId()} = maskLine;
   const [startPointMask, endPointMask] = getStartEndPT(maskLine);
   const startPointOverlapLine = turf.nearestPointOnLine(fromLine, startPointMask, {units:'meters'})
   const endPointOverlapLine = turf.nearestPointOnLine(fromLine, endPointMask, {units:'meters'})
+  startPointOverlapLine.id = id + 1000000;
+  endPointOverlapLine.id = id + 1000000;
   return [startPointOverlapLine, endPointOverlapLine]
 }
 
@@ -66,6 +73,8 @@ const alignOverlapPT = (startPoint, endPoint) => {
 
 const splitLineToPoint = (fromLine, startPoint, toPoint) => {
   const lineSliced = turf.lineSlice(startPoint, toPoint, fromLine);
+  lineSliced.id = startPoint.id || uniqId();
+  lineSliced.properties = {...fromLine.properties};
   return lineSliced;
 }
 
@@ -100,6 +109,7 @@ const main = () => {
   if(debug === true){
     sortedPTs.forEach(([startPT, endPT]) => {
       console.log('##########################')
+      console.log(startPT, endPT)
       print(startPT.properties.location);
       print(startPT.geometry)
       print(endPT.geometry)
@@ -122,7 +132,8 @@ const main = () => {
       const lastResult = splitLineToPoint(fromLine, endMaskPT, getStartEndPT(fromLine)[1]);
       results.push(lastResult)}
   }
-  print(results)
+  console.log(results)
+  print(turf.featureCollection(results));
 }
 
 main()
