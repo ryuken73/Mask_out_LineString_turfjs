@@ -134,9 +134,11 @@ module.exports.mergeOneLineStringFeature = featureCollection => {
 }
 
 module.exports.isLineEqual = (lineFeature1, lineFeature2) => {
-  // console.log('-----------------------------------------');
-  // console.log('first:', lineFeature1.geometry, 'second', lineFeature2.geometry)
   return turf.booleanEqual(lineFeature1.geometry, lineFeature2.geometry);
+};
+
+module.exports.isGeomOfFeatureEqual = (feature1, feature2) => {
+  return turf.booleanEqual(feature1.geometry, feature2.geometry);
 };
 
 // mask fromLine with maskLine

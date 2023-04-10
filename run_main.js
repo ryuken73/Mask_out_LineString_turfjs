@@ -17,16 +17,18 @@ const {
 const redFile = fs.createWriteStream('./red.json');
 const yellowFile = fs.createWriteStream('./yellow.json');
 const splitedFile = fs.createWriteStream('./splited.json');
+const allFile = fs.createWriteStream('./fc.json');
 
 const main = () => {
 
   const [redFeatures, yellowFeatures] = splitRedYellowFeatures(featureCollectionArray);
-  // const totalFeatures = [
-  //   ...redFeatures,
-  //   ...yellowFeatures
-  // ]
-  // const uniqF = uniqLines(totalFeatures);
+  const totalFeatures = [
+    ...redFeatures,
+    ...yellowFeatures
+  ]
+  const uniqF = uniqLines(totalFeatures);
   // console.log(JSON.stringify(turf.featureCollection(uniqF)));
+  allFile.write(JSON.stringify(turf.featureCollection(uniqF)));
   const fromRedFeatures = redFeatures[4];
 
   redFeatures.forEach(redFeature => {
