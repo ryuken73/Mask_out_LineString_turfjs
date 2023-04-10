@@ -20,7 +20,15 @@ const splitedFile = fs.createWriteStream('./splited.json');
 const allFile = fs.createWriteStream('./fc.json');
 
 const main = () => {
-
+  const debug = {
+    "diffPoints": false,
+    "maskLine": true,
+    "checkInverse": true,
+    "overlapPTs": true,
+    "align": true,
+    "sort": true,
+    "irregular": true
+  }
   const [redFeatures, yellowFeatures] = splitRedYellowFeatures(featureCollectionArray);
   const totalFeatures = [
     ...redFeatures,
@@ -38,12 +46,12 @@ const main = () => {
     console.log(`number of intersect yellow: ${redFeature.id}:`, intersects.length);
   })
 
-  const fromLine = redFeatures[1];
+  const fromLine = redFeatures[6];
   const maskLines = yellowFeatures.filter(yellowFeature => {
     return isFeatureIntersects(fromLine, yellowFeature)
   })
 
-  const results = splitRed(fromLine, maskLines, true)
+  const results = splitRed(fromLine, maskLines, debug)
   splitedFile.write(JSON.stringify(results));
 
   const redFeatureCollection = mergeOneFeatureCollection(redFeatures);
